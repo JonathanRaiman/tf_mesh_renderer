@@ -18,14 +18,21 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import os
+import os.path as osp
 import tensorflow as tf
 
 import camera_utils
 
-rasterize_triangles_module = tf.load_op_library(
-    os.path.join(os.environ['TEST_SRCDIR'],
-    'tf_mesh_renderer/mesh_renderer/kernels/rasterize_triangles_kernel.so'))
+
+def get_ext_filename(ext_name):
+    from distutils.sysconfig import get_config_var
+    ext_path = ext_name.split('.')
+    ext_suffix = get_config_var('EXT_SUFFIX')
+    return osp.join(*ext_path) + ext_suffix
+
+
+rasterize_triangles_module_path = osp.join(osp.dirname(osp.realpath(__file__)), get_ext_filename('mesh_renderer_lib'))
+rasterize_triangles_module = tf.load_op_library(rasterize_triangles_module_path)
 
 
 def rasterize(world_space_vertices, attributes, triangles, camera_matrices,
