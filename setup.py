@@ -42,6 +42,21 @@ REMOVE_FLAGS = {'-Wstrict-prototypes'}
 
 
 class mesh_renderer_build_ext(build_ext):
+    def get_libraries(self, ext):
+        libs = super(mesh_renderer_build_ext, self).get_libraries(ext)
+        last_lib = [libs[-1], "python{}".format(sys.version_info.major)]
+        actual_python_libname = None
+        for ll in last_lib:
+            if actual_python_libname is not None:
+                break
+            for path in self.library_dirs:
+                if osp.exists(osp.join(path, "lib" + ll + ".so")):
+                    actual_python_libname = ll
+                    break
+        if actual_python_libname is None:
+            actual_python_libname = libs[-1]
+        return libs[:-1] + [actual_python_libname]
+
     def build_extensions(self):
         extension = self.extensions[0]
         assert extension.name == 'mesh_renderer_lib'
