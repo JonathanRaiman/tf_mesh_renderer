@@ -56,3 +56,7 @@ If you use this renderer in your research, please cite [this paper](http://opena
   year = {2018}
 }
 ```
+
+
+Bust of safo: https://cdn.thingiverse.com/zipfiles/ac/39/53/07/80/Bust_of_Sappho_.zip
+
