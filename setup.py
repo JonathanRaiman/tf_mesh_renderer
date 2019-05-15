@@ -111,7 +111,7 @@ setup(
     py_modules=['mesh_renderer', 'camera_utils', 'rasterize_triangles'],
     ext_modules=[mesh_renderer_lib],
     description='TF rendering',
-    author='Someone, OpenAI',
-    author_email='google@openai.com',
+    author='Jonathan Raiman',
+    author_email='raiman@openai.com',
     install_requires=[],
 )

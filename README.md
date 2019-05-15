@@ -1,3 +1,62 @@
+# TF Mesh Renderer
+
+This is a differentiable, 3D mesh renderer using TensorFlow.
+[Original repository](https://github.com/google/tf_mesh_renderer).
+
+This for sends it to Pypi, and removes bazel as a dependency for installation
+(e.g. just use `python3 setup.py install`).
+
+### Installation
+```
+pip install mesh_renderer
+```
+
+### Usage
+
+```
+# load your geometry (this is a cube):
+object_vertices = np.array([[-1, -1, 1], [-1, -1, -1], [-1, 1, -1], [-1, 1, 1], [1, -1, 1],
+                            [1, -1, -1], [1, 1, -1], [1, 1, 1]])
+object_triangles = np.array([[0, 1, 2], [2, 3, 0], [3, 2, 6], [6, 7, 3], [7, 6, 5], [5, 4, 7],
+                             [4, 5, 1], [1, 0, 4], [5, 6, 2], [2, 1, 5], [7, 4, 0], [0, 3, 7]], dtype=np.int32)
+object_vertices = tf.constant(object_vertices, dtype=tf.float32)
+object_triangles = tf.constant(object_triangles, dtype=tf.int32)
+object_normals = tf.nn.l2_normalize(object_vertices, dim=1)
+
+# rotate the geometry:
+angles = [[-1.16, 0.00, 3.48]]
+
+model_rotation = camera_utils.euler_matrices(angles)[0, :3, :3]
+# camera position:
+eye = tf.constant([[0.0, 0.0, 6.0]], dtype=tf.float32)
+lightbulb = tf.constant([[0.0, 0.0, 6.0]], dtype=tf.float32)
+center = tf.constant([[0.0, 0.0, 0.0]], dtype=tf.float32)
+world_up = tf.constant([[0.0, 1.0, 0.0]], dtype=tf.float32)
+vertex_diffuse_colors = tf.reshape(tf.ones_like(vertices), [1, vertices.get_shape()[0].value, 3])
+light_positions = tf.expand_dims(lightbulb, axis=0)
+light_intensities = tf.ones([1, 1, 3], dtype=tf.float32)
+ambient_color = tf.constant([[0.0, 0.0, 0.0]])
+
+vertex_positions = tf.reshape(
+    tf.matmul(vertices, model_rotation, transpose_b=True),
+    [1, vertices.get_shape()[0].value, 3])
+desired_normals = tf.reshape(
+    tf.matmul(normals, model_rotation, transpose_b=True),
+    [1, vertices.get_shape()[0].value, 3])
+
+# render is a tf.Tensor 3d tensor of shape height x width x 4 (r, g, b, a)
+# you can backpropagate through it.
+render = mesh_renderer.mesh_renderer(
+    vertex_positions, triangles, desired_normals,
+    vertex_diffuse_colors, eye, center, world_up, light_positions,
+    light_intensities, image_width, image_height,
+    ambient_color=ambient_color,
+)
+```
+
+
+# Original Readme
+
 This is a differentiable, 3D mesh renderer using TensorFlow.
 
 This is not an official Google product.
