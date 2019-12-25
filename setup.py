@@ -71,11 +71,19 @@ class mesh_renderer_build_ext(build_ext):
         if "__cxx11_abi_flag__" in tf.__dict__:
             abi = tf.__cxx11_abi_flag__
         else:
-            tf_path = tf.__path__[0]
-            if tf_version_minor >= 4:
-                tf_so = '{}/libtensorflow_framework.so'.format(tf_path)
+            link_flags = tf.sysconfig.get_link_flags()
+            if len(link_flags) > 1:
+                tf_path = link_flags.pop(0).split("-L")[-1]
+                if sys.platform.startswith("darwin"):
+                    tf_so = osp.join(tf_path, link_flags[0].split("-l")[-1])
+                else:
+                    tf_so = osp.join(tf_path, link_flags[0].split("-l:")[-1])
             else:
-                tf_so = '{}/python/_pywrap_tensorflow_internal.so'.format(tf_path)
+                tf_path = tf.__path__[0]
+                if tf_version_minor >= 4:
+                    tf_so = '{}/libtensorflow_framework.so'.format(tf_path)
+                else:
+                    tf_so = '{}/python/_pywrap_tensorflow_internal.so'.format(tf_path)
 
             gcc_from_tf = subprocess.check_output("strings " + tf_so + " | grep GCC | grep ubuntu | uniq || true", shell=True).decode("utf-8").strip()
             clang_from_tf = subprocess.check_output("strings " + tf_so + " | grep clang || true", shell=True).decode("utf-8").strip()
