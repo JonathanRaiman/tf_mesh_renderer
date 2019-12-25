@@ -87,7 +87,7 @@ class mesh_renderer_build_ext(build_ext):
 
             gcc_from_tf = subprocess.check_output("strings " + tf_so + " | grep GCC | grep ubuntu | uniq || true", shell=True).decode("utf-8").strip()
             clang_from_tf = subprocess.check_output("strings " + tf_so + " | grep clang || true", shell=True).decode("utf-8").strip()
-                
+
             if len(gcc_from_tf) > 5:
                 assert len(gcc_from_tf) > 5, "Cannot extract tensorflow gcc version."
                 gcc_version = gcc_from_tf.split("-")[0].split(" ")[-1]
