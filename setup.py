@@ -75,9 +75,9 @@ class mesh_renderer_build_ext(build_ext):
             if len(link_flags) > 1:
                 tf_path = link_flags.pop(0).split("-L")[-1]
                 if sys.platform.startswith("darwin"):
-                    tf_so = os.path.join(tf_path, link_flags[0].split("-l")[-1])
+                    tf_so = osp.join(tf_path, link_flags[0].split("-l")[-1])
                 else:
-                    tf_so = os.path.join(tf_path, link_flags[0].split("-l:")[-1])
+                    tf_so = osp.join(tf_path, link_flags[0].split("-l:")[-1])
             else:
                 tf_path = tf.__path__[0]
                 if tf_version_minor >= 4:
